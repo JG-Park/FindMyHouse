@@ -98,7 +98,7 @@ def send_email(name, email, inquiry_type, inquiry_details):
 
 ## 발표자료 PDF 
 - 발표자료 PDF는 아래와 같습니다.
-  + [00발표자료_2024](portfolio.pdf)
+  + [portfolio.pdf](portfolio.pdf)
 
 ## License
 - 라이선스 링크 아웃링크로 처리
