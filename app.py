@@ -8,6 +8,9 @@ from plotly.subplots import make_subplots
 from streamlit_option_menu import option_menu
 
 # SEOUL_PUBLIC_API = st.secrets["SEOUL_PUBLIC_API"]
+# MAIL_KEY = st.secrets["MAIL_KEY"]
+SEOUL_PUBLIC_API = "####"
+MAIL_KEY = "####"
 
 @st.cache_data
 def load_data():
@@ -56,6 +59,15 @@ def show_dataframe(dataframe):
 def main_page():
     st.title("🏠 내집을 찾아서")
     st.subheader("서울 집 값, 어디까지 알아보고 오셨어요?")
+    st.markdown("* 본 프로젝트는 서울 부동산 시장에서 적절한 주택을 찾는 과정을 지원하는 것을 목표로 합니다.")
+    st.markdown("* 사용자가 원하는 조건을 입력하면 서울에서 필요한 조건에 따른 부동산 시세를 그래프 및 도표 형태로 보여줍니다.")
+    st.markdown("* 이를 통해 사용자 입장에서 필요한 전·월세 실거래 정보를 한눈에 확인하고, 위치별 시세를 비교하여 집을 구하는 시간을 단축할 수 있습니다.\n\n")
+    st.markdown("\n")
+    st.markdown("\n")
+
+    st.subheader("프로젝트 개요")
+    st.markdown("멀티캠퍼스 멀티잇 데이터 분석 & 엔지니어 34회차")
+    st.markdown("Team 1 Mini-Project : '내 집을 찾아서'  [GitHub](https://github.com/JG-Park/findmyhouse)")
 
 # 자치구별 시세 페이지
 def sgg_page(recent_data):
@@ -274,12 +286,65 @@ def yearly_page(recent_data):
         st.write("거래내역이 없습니다. 다른 옵션을 선택하세요.")
 
 
+
+
+# 지원 및 문의 페이지
+def support_page():
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    def send_email(name, email, inquiry_type, inquiry_details):
+        # 보내는 사람, 받는 사람 이메일 설정
+        sender_email = "jgp3620@gmail.com"  # 보내는 사람 이메일 주소
+        receiver_emails = ["juyoungeeya@gmail.com", "jgp3620@gmail.com", "wls9416@gmail.com", "rhkrcjswo@gmail.com", "jweon96@gmail.com"]  # 받는 사람 이메일 주소
+
+        # 이메일 제목과 내용 설정
+        subject = f"새로운 문의: {inquiry_type} - {name}"
+        body = f"""
+        이름: {name}
+        이메일: {email}
+        문의 유형: {inquiry_type}
+        문의 내용:
+        {inquiry_details}
+        """
+
+        # 이메일 메시지 설정
+        message = MIMEMultipart()
+        message["From"] = sender_email
+        message["To"] = ", ".join(receiver_emails)  # 여러 이메일 주소를 쉼표로 구분하여 문자열로 변환
+        message["Subject"] = subject
+        message.attach(MIMEText(body, "plain"))
+
+        # SMTP 서버에 연결하여 이메일 보내기
+        try:
+            server = smtplib.SMTP("smtp.gmail.com", 587)  # SMTP 서버 주소와 포트
+            server.starttls()  # TLS 암호화 시작
+            server.login(sender_email, MAIL_KEY)  # 이메일 계정 로그인
+            server.sendmail(sender_email, receiver_emails, message.as_string())  # 이메일 보내기
+            st.success("이메일이 성공적으로 전송되었습니다!")
+        except Exception as e:
+            st.error(f"이메일을 보내는 중 오류가 발생했습니다: {e}")
+        finally:
+            server.quit()  # SMTP 서버 연결 종료
+
+    st.title("지원 및 문의")
+
+    # 사용자 정보 입력
+    name = st.text_input("이름")
+    email = st.text_input("이메일 주소")
+    inquiry_type = st.selectbox("문의 유형", ["기술 지원", "문의 사항", "기타"])
+    inquiry_details = st.text_area("문의 내용", height=200)
+
+    # 문의 제출 버튼
+    if st.button("문의 제출"):
+        send_email(name, email, inquiry_type, inquiry_details)
+
 def main():
     st.set_page_config(
         page_title="내 집을 찾아서",
         page_icon="🏠",
-        layout="wide",
-        initial_sidebar_state="expanded",
+        # layout="wide",
+        # initial_sidebar_state="expanded",
         # menu_items={
         #     'Get Help': 'https://www.extremelycoolapp.com/help',
         #     'Report a bug': "https://www.extremelycoolapp.com/bug",
@@ -300,8 +365,8 @@ def main():
 
     # 사이드바 메뉴
     with st.sidebar:
-        selected_menu = option_menu("메뉴 선택", ["메인 페이지", "내가 살 곳 찾기", "집 값 파악하기"],
-                            icons=['bi bi-house-fill','bi bi-geo-alt-fill', 'bi bi-currency-dollar'], menu_icon='bi bi-check',
+        selected_menu = option_menu("기능 선택", ["메인 페이지", "내가 살 곳 찾기", "집 값 파악하기", "지원 및 문의"],
+                            icons=['bi bi-house-fill','bi bi-geo-alt-fill', 'bi bi-currency-dollar', 'bi bi-info-circle'], menu_icon='bi bi-check',
                             styles={"container": {"background-color": "#3081D0", "padding": "0px"},
                                     "nav-link-selected": {"background-color": "#EEEEEE", "color": "#262730"}})
 
@@ -317,6 +382,9 @@ def main():
             choice = option_menu("집 값 파악하기", ["최근 1개월 계약 현황", "2023년 실거래가 추이"],
                                  icons=['bi bi-pen-fill','bi-graph-up-arrow'], menu_icon='bi bi-currency-dollar',
                                  styles={"container": {"background-color": "#FC6736"}, "nav-link-selected": {"background-color": "#EEEEEE", "color": "#262730"}})
+        
+        elif selected_menu == "지원 및 문의":
+            choice = "지원 및 문의"
 
     # 페이지 보이기
     if choice == "메인 페이지":
@@ -336,6 +404,9 @@ def main():
 
     elif choice == "2023년 실거래가 추이":
          yearly_page(recent_data)
+
+    elif choice == "지원 및 문의":
+        support_page()
     
 if __name__ == '__main__':
     main()
