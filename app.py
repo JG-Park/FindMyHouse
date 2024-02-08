@@ -57,7 +57,7 @@ def show_dataframe(dataframe):
 
 # 메인 페이지
 def main_page():
-    st.title("🏠 내집을 찾아서")
+    st.title("🏠 내 집을 찾아서(FindMyHouse)")
     st.subheader("서울 집 값, 어디까지 알아보고 오셨어요?")
     st.markdown("* 본 프로젝트는 서울 부동산 시장에서 적절한 주택을 찾는 과정을 지원하는 것을 목표로 합니다.")
     st.markdown("* 사용자가 원하는 조건을 입력하면 서울에서 필요한 조건에 따른 부동산 시세를 그래프 및 도표 형태로 보여줍니다.")
